@@ -85,38 +85,30 @@ class Program
 
   private static void AddItem()
   {
-    PrintTitle();
+    string category;
+    string newCategory = $"[SeaGreen1]_Add a new {Column.category}[/]";
 
-    if (HabitRepository.TotalRows() == 0)
-      NoEntriesFound();
+    string colorHighlight = "Green";
+
+    List<string> categories = HabitRepository.QueryUniqueRowEntries($"{Column.category}");
+    categories.Add(newCategory);
+    categories.Sort();
+
+    var selection = ChoicesPrompt.SelectCategory(categories, colorHighlight);
+
+    if (selection == newCategory)
+      category = AnsiConsole.Ask<string>($"Enter a new {Column.category} type:");
 
     else
-    {
-      string category;
-      string newCategory = $"[SeaGreen1]_Add a new {Column.category}[/]";
+      category = selection;
 
-      string colorHighlight = "Green";
+    AnsiConsole.MarkupLine($"[{colorHighlight}]Adding[/]: {selection}");
+    string date = AnsiConsole.Ask<DateTime>($"Enter the {Column.date} (YYYY.MM.DD):").ToString("d");
+    int quantity = AnsiConsole.Ask<int>($"Enter the {Column.quantity}:");
 
-      List<string> categories = HabitRepository.QueryUniqueRowEntries($"{Column.category}");
-      categories.Add(newCategory);
-      categories.Sort();
+    HabitRepository.Add(category, date, quantity);
 
-      var selection = ChoicesPrompt.SelectCategory(categories, colorHighlight);
-
-      if (selection == newCategory)
-        category = AnsiConsole.Ask<string>($"Enter a new {Column.category} type:");
-
-      else
-        category = selection;
-
-      AnsiConsole.MarkupLine($"[{colorHighlight}]Adding[/]: {selection}");
-      string date = AnsiConsole.Ask<DateTime>($"Enter the {Column.date} (YYYY.MM.DD):").ToString("d");
-      int quantity = AnsiConsole.Ask<int>($"Enter the {Column.quantity}:");
-
-      HabitRepository.Add(category, date, quantity);
-
-      AnsiConsole.MarkupLine($"[{colorHighlight}]A new entry has been succesfully added.[/]\n");
-    }
+    AnsiConsole.MarkupLine($"[{colorHighlight}]A new entry has been succesfully added.[/]\n");
   }
 
   private static void EditItem()
